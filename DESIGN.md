@@ -47,7 +47,7 @@ components:
 
 ## Overview
 
-The implemented system uses regular Inter, generous white space, and black text. Organisation links reveal compact, factual previews. The home composition and scope remain in `.impeccable/surfaces/src-pages-index-astro.md`.
+The implemented system uses regular Inter, generous white space, and black text. Project and organisation links reveal compact, factual previews. The home composition and scope remain in `.impeccable/surfaces/src-pages-index-astro.md`.
 
 ## Colors
 
@@ -73,8 +73,16 @@ Preview cards are square with `border border-black` (1px). Images use `object-co
 
 `PreviewLink.astro` renders a normal external anchor, not a button or modal. Its persistent dotted underline uses `underline decoration-dotted decoration-1 underline-offset-4`. Keyboard focus adds `focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-black`.
 
-The initially invisible `role="tooltip"` wrapper becomes visible through `data-open`. Its card uses the frontmatter's preview-card tokens, with `max-w-[calc(100vw-3rem)]`. Local TVM and Post-Credits images are converted by Astro to WebP at width 512; their displayed boxes use `mb-3 h-40 w-full object-contain` (12px bottom gap, 160px height). MWS has no image. Each card contains a medium-weight title and one descriptive sentence separated by `mt-1` (4px). The anchor's `aria-describedby` references that sentence; the page also has an `sr-only` heading.
+The initially invisible `role="tooltip"` wrapper becomes visible through `data-open`. Its card uses the frontmatter's preview-card tokens, with `max-w-[calc(100vw-3rem)]`. Bundled TVM and Post-Credits images are converted by Astro to WebP at width 512. CMS uploads use validated R2 WebP images; their displayed boxes retain `mb-3 h-40 w-full object-contain` (12px bottom gap, 160px height). Links without an image use text-only cards. Each card contains a medium-weight title and an optional descriptive sentence separated by `mt-1` (4px). The anchor's `aria-describedby` references the sentence only when present; the page also has an `sr-only` heading.
 
-The wrapper is viewport-bottom-fixed by default (`fixed bottom-6 left-1/2 -translate-x-1/2 pb-3`): 24px bottom offset plus 12px transparent bottom padding. Only **width ≥1024px AND height ≥700px** switches it to `absolute bottom-full` above its relative link wrapper; horizontal centring is retained.
+The wrapper is viewport-bottom-fixed by default (`fixed bottom-6 left-1/2 -translate-x-1/2 pb-3`): 24px bottom offset plus 12px transparent bottom padding. Only **width ≥1024px AND height ≥700px** switches it to `absolute bottom-full` above its relative link wrapper; horizontal centring is retained. Opening measures the card; if it would cross a 16px viewport gutter, `data-detached` keeps the fixed placement instead, so links near the top of the longer paragraph remain usable.
 
 Non-touch pointer entry opens one preview unless keyboard-visible focus is active. Focus entering a link opens its preview and closes others; leaving its wrapper closes it. Pointer movement retains an unfocused preview inside the axis-aligned safe corridor spanning the link and tooltip rectangles, including their gap; leaving it closes the preview without a timer. A focused preview remains open during pointer movement. Escape closes all previews. Touch pointer events do not open or dismiss previews; normal link navigation is preserved.
+
+## Administration
+
+`/admin` is an Operate surface within the same visual system, not a dashboard or a separate brand. Its surface brief is `.impeccable/surfaces/src-pages-admin-index-astro.md`. `AdminLayout.astro` keeps self-hosted Inter, black/white selection, and a keyboard skip link. Sign-in is a narrow, vertically centred form; the editor uses a `max-w-6xl` container with a compact action header.
+
+The editor stacks paragraph and selected-link details on phones, becoming a wider paragraph column and a narrower details column at `lg`. Page headings use `text-2xl font-medium`, section headings `text-lg font-medium`, labels/help/actions `text-sm`, and form values `text-base`. Primary buttons and fields use `min-h-11` (44px), square 1px borders, and visible black focus outlines. Inline preview phrases keep their natural text line boxes rather than becoming large controls.
+
+The black-filled Publish action is the primary control; secondary controls invert black/white on hover. Disabled controls use reduced opacity and disabled cursors. Status text names loading, unpublished edits, validation, upload, publishing, conflict, and success states without relying on colour. Selected-link previews retain the public card's image-fit, title weight, and descriptive spacing. There are no added shadows, gradients, icons, or decorative motion. The new surface reuses existing colour/font/shape tokens; the public composition remains unchanged.

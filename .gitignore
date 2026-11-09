@@ -1,5 +1,8 @@
 node_modules/
 dist/
+.vercel/
+playwright-report/
+test-results/
 .astro/
 .env
 .env.*

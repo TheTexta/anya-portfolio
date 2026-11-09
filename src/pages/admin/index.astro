@@ -1,0 +1,50 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import AdminEditor from "../../components/AdminEditor.astro";
+import { backendConfig, uploadsEnabled } from "../../lib/cms/config.server";
+import { loadPortfolio, requireEditor } from "../../lib/cms/backend.server";
+import { HttpError } from "../../lib/cms/http.server";
+
+let configured = true;
+let record;
+let message = "";
+try {
+  backendConfig();
+  await requireEditor(Astro.cookies, Astro.request);
+  record = await loadPortfolio();
+} catch (error) {
+  if (error instanceof HttpError && error.status === 401) {
+    // A visitor without a session sees only the sign-in form.
+  } else {
+    configured = error instanceof HttpError && error.status === 403;
+    Astro.response.status = error instanceof HttpError ? error.status : 503;
+    message = error instanceof HttpError ? error.message : "The editor is temporarily unavailable. Try again shortly.";
+  }
+}
+const loginError = Astro.url.searchParams.get("error");
+if (!message && loginError) message = loginError === "access"
+  ? "This account could not access Anya’s portfolio. Ask the site owner to check your access."
+  : "Sign in failed. Check your email and password, then try again.";
+---
+<AdminLayout title={record ? "Portfolio editor" : "Sign in"}>
+  {record ? <AdminEditor record={record} canUpload={uploadsEnabled()} /> : (
+    <main id="admin-main" class="mx-auto flex min-h-svh max-w-md flex-col justify-center px-6 py-16">
+      <h1 class="text-2xl font-medium">Edit Anya’s portfolio</h1>
+      <p class="mt-3 text-sm leading-relaxed">Sign in to update the paragraph and its linked previews.</p>
+      {message && <p role="alert" class="mt-6 border border-black p-4 text-sm leading-relaxed">{message}</p>}
+      <form action="/api/admin/login" method="post" class="mt-8 space-y-5">
+        <label for="email" class="block text-sm font-medium">Email
+          <input id="email" name="email" type="email" autocomplete="username" maxlength="254" required disabled={!configured}
+            class="mt-2 block min-h-11 w-full border border-black px-3 py-2 text-base focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-50" />
+        </label>
+        <label for="password" class="block text-sm font-medium">Password
+          <input id="password" name="password" type="password" autocomplete="current-password" maxlength="1024" required disabled={!configured}
+            class="mt-2 block min-h-11 w-full border border-black px-3 py-2 text-base focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-50" />
+        </label>
+        <button type="submit" disabled={!configured} class="min-h-11 w-full cursor-pointer border border-black bg-black px-4 py-2 text-sm text-white hover:bg-white hover:text-black focus-visible:outline-2 focus-visible:outline-offset-4 disabled:cursor-not-allowed disabled:opacity-40">Sign in</button>
+      </form>
+      <p class="mt-5 text-sm leading-relaxed">Access is invitation-only. For access or a password reset, contact the site owner.</p>
+      <a href="/" class="mt-8 self-start py-2 text-sm underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2">Back to portfolio</a>
+    </main>
+  )}
+</AdminLayout>

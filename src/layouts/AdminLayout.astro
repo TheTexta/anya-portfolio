@@ -1,0 +1,20 @@
+---
+import "@fontsource-variable/inter/wght.css";
+import "../styles/global.css";
+interface Props { title: string }
+const { title } = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" href="data:," />
+    <title>{title} — Anya Kasuri</title>
+  </head>
+  <body class="bg-white font-sans text-black antialiased selection:bg-black selection:text-white">
+    <a href="#admin-main" class="sr-only focus:not-sr-only focus:fixed focus:left-6 focus:top-4 focus:z-50 focus:border focus:border-black focus:bg-white focus:px-4 focus:py-2">Skip to editor</a>
+    <slot />
+  </body>
+</html>

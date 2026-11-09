@@ -7,25 +7,27 @@ interface Props {
   href: string;
   title: string;
   summary: string;
-  image?: ImageMetadata;
+  image?: ImageMetadata | string;
   imageAlt?: string;
 }
 
 const { id, href, title, summary, image, imageAlt = "" } = Astro.props;
 ---
 
-<span class="group relative" data-preview data-open="false">
+<span class="group relative" data-preview data-open="false" data-detached="false">
   <a
     href={href}
-    aria-describedby={`${id}-summary`}
+    aria-describedby={summary ? `${id}-summary` : undefined}
     class="underline decoration-dotted decoration-1 underline-offset-4 focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-black"
   ><slot /></a>
   <span
     role="tooltip"
-    class="invisible fixed bottom-6 left-1/2 z-10 w-72 max-w-[calc(100vw-3rem)] -translate-x-1/2 pb-3 text-left text-sm leading-normal group-data-[open=true]:visible [@media(min-width:1024px)_and_(min-height:700px)]:absolute [@media(min-width:1024px)_and_(min-height:700px)]:bottom-full"
+    class="invisible fixed bottom-6 left-1/2 z-10 w-72 max-w-[calc(100vw-3rem)] -translate-x-1/2 pb-3 text-left text-sm leading-normal group-data-[open=true]:visible [@media(min-width:1024px)_and_(min-height:700px)]:group-data-[detached=false]:absolute [@media(min-width:1024px)_and_(min-height:700px)]:group-data-[detached=false]:bottom-full"
   >
     <span class="block border border-black bg-white p-4">
-      {image && (
+      {typeof image === "string" ? (
+        <img src={image} alt={imageAlt} width="512" height="320" loading="lazy" decoding="async" class="mb-3 h-40 w-full object-contain" />
+      ) : image && (
         <Image
           src={image}
           alt={imageAlt}
@@ -35,7 +37,7 @@ const { id, href, title, summary, image, imageAlt = "" } = Astro.props;
         />
       )}
       <span class="block font-medium">{title}</span>
-      <span id={`${id}-summary`} class="mt-1 block">{summary}</span>
+      {summary && <span id={`${id}-summary`} class="mt-1 block">{summary}</span>}
     </span>
   </span>
 </span>
@@ -50,7 +52,14 @@ const { id, href, title, summary, image, imageAlt = "" } = Astro.props;
   previews.forEach((preview) => {
     const open = () => {
       closePreviews();
+      preview.dataset.detached = "false";
       preview.dataset.open = "true";
+
+      const bounds = preview.querySelector('[role="tooltip"]')!.getBoundingClientRect();
+      preview.dataset.detached = String(
+        bounds.top < 16 || bounds.left < 16 ||
+        bounds.bottom > window.innerHeight - 16 || bounds.right > window.innerWidth - 16,
+      );
     };
 
     preview.addEventListener("pointerenter", (event) => {

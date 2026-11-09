@@ -1,0 +1,19 @@
+---
+import PreviewLink from "./PreviewLink.astro";
+import type { PortfolioDocument } from "../lib/cms/content";
+import { bundledImages } from "../lib/cms/bundled-images";
+import { publicImageUrl } from "../lib/cms/config.server";
+
+interface Props { document: PortfolioDocument }
+const { document } = Astro.props;
+const links = new Map(document.links.map((link) => [link.id, link]));
+---
+<p class="text-center text-xl leading-relaxed sm:text-2xl">
+  {document.segments.map((segment, index) => {
+    const link = segment.linkId ? links.get(segment.linkId) : undefined;
+    if (!link) return segment.text;
+    const image = link.image?.kind === "bundled" ? bundledImages[link.image.id]
+      : link.image?.kind === "upload" ? publicImageUrl(link.image.id) : undefined;
+    return <PreviewLink {...link} id={`preview-${link.id}-${index}`} image={image}>{segment.text}</PreviewLink>;
+  })}
+</p>
