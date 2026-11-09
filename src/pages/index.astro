@@ -1,0 +1,53 @@
+---
+import "@fontsource-variable/inter/wght.css";
+import interFont from "@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url";
+import "../styles/global.css";
+import PreviewLink from "../components/PreviewLink.astro";
+import tvmImage from "../assets/tvm.png";
+import postCreditsImage from "../assets/post-credits.jpg";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Anya Kasuri — a young media strategist fascinated by what makes audiences watch, click, and act."
+    />
+    <link rel="preload" href={interFont} as="font" type="font/woff2" crossorigin />
+    <link rel="icon" href="data:," />
+    <title>Anya Kasuri</title>
+  </head>
+  <body class="bg-white font-sans text-black antialiased selection:bg-black selection:text-white">
+    <main class="flex min-h-svh items-center justify-center px-6 py-16 sm:px-[15vw] lg:px-[30vw]">
+      <h1 class="sr-only">Anya Kasuri</h1>
+      <p class="text-center text-xl leading-relaxed sm:text-2xl">
+        A young media strategist fascinated by what makes audiences watch, click, and act.{" "}
+        <PreviewLink
+          id="tvm"
+          href="https://www.tvmtelevision.com/"
+          title="TVM: Student Television at McGill"
+          summary="McGill’s student-run television and film organisation, led by Anya as President."
+          image={tvmImage}
+          imageAlt="TVM logo"
+        >TVM</PreviewLink> President.{" "}
+        <PreviewLink
+          id="post-credits"
+          href="https://www.tvmtelevision.com/post-credits"
+          title="Post-Credits"
+          summary="TVM’s film magazine, edited by Anya as Editor-in-Chief."
+          image={postCreditsImage}
+          imageAlt="Post-Credits magazine cover"
+        >Post-Credits</PreviewLink> Editor-in-Chief.{" "}
+        <PreviewLink
+          id="mws"
+          href="https://www.instagram.com/mcgillwinesociety/"
+          title="McGill Wine Society"
+          summary="McGill Wine Society’s Instagram, managed by Anya."
+        >MWS</PreviewLink> Social media manager.
+      </p>
+    </main>
+  </body>
+</html>
