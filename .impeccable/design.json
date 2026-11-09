@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-09T00:00:00Z",
+  "title": "Design System: Anya Kasuri",
+  "extensions": {
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "preview-above-link", "value": "(min-width: 1024px) and (min-height: 700px)" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Organisation preview link",
+      "kind": "custom",
+      "refersTo": "preview-card",
+      "description": "Implemented in src/components/PreviewLink.astro. A dotted-underlined external anchor describes itself through its summary ID; a non-interactive role=tooltip contains a title, one sentence, and optional local imagery. Keyboard focus has a visible outline. Non-touch pointer entry opens one preview unless keyboard-visible focus is active; focus entry also opens one and closes others. Focus exit outside the wrapper closes it. Pointer movement preserves an unfocused preview inside the axis-aligned bounding corridor joining the link and tooltip rectangles, closing it outside; a focused preview is exempt. Escape closes all. Touch pointer events are ignored, leaving native navigation intact. Visibility changes immediately via data-open, without animation or timers. Placement is viewport-bottom-fixed unless both dimensions meet preview-above-link, when it is absolute above the relative link wrapper. Exact Tailwind classes and measurements are recorded in DESIGN.md; no standalone rendering snippet is supplied."
+    }
+  ]
+}
