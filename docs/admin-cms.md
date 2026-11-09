@@ -212,6 +212,31 @@ This is not a reusable media library or an asset-revocation system.
   performed by the owner; no password was requested or changed and no substitute
   account or production session was created for testing.
 
+### Application release acceptance — 2026-11-09
+
+- Initial application release commit:
+  `913e55db964ea85cfedfaa470fd672564b80060f`. Its Git-triggered production deployment
+  `dpl_E2vjK1NxPE8mCZMpE3FnDxx7msuf` reached READY and was assigned the canonical
+  `https://anya-portfolio-liard.vercel.app` alias. Later documentation-only pushes
+  deploy automatically through the same connected GitHub `main` branch.
+- Live `/` returned 200 with the unchanged seeded paragraph and working bundled
+  previews. Live `/admin` returned 200 with enabled email/password fields, no setup
+  error, `Cache-Control: private, no-store`, and `X-Robots-Tag: noindex, nofollow`.
+- Anonymous same-origin POSTs to content, upload initialization, and upload
+  finalization returned 401. Wrong-origin POSTs returned 403. Anonymous private
+  preview GET returned 401. No mutations were performed by these denial checks.
+- Headless Chrome confirmed exact visible paragraph copy, loaded keyboard-focus
+  preview imagery, Escape dismissal, desktop/mobile rendering, and an enabled
+  phone-width sign-in form without overflow. Captures are development-only under
+  ignored `.impeccable/review/live-*.png`.
+- Release checks passed: Astro diagnostics, 12 unit/isolated database/mocked storage
+  tests, seven fixture-backed browser tests, Vercel production build, zero npm-audit
+  findings, and the separate 89-test Worker suite plus dry-run. These do not replace
+  the real owner-authenticated browser acceptance described above.
+- Anya app changes and the isolated Worker delivery change were committed and
+  pushed to their respective `main` branches. Unrelated work in the shared
+  infrastructure checkout was preserved and was not included in the Worker commit.
+
 Text/link editing and bundled-image selection work without R2 configuration;
 uploads are visibly disabled until the image configuration is present. Once
 uploaded images are referenced, the service key and R2 configuration are required
