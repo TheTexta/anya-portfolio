@@ -25,22 +25,14 @@ export function toEditorDocument(document: PortfolioDocument): EditorNode {
   ));
 }
 
-export function editorLinks(doc: EditorNode): Map<string, PortfolioLink> {
-  const links = new Map<string, PortfolioLink>();
-  doc.descendants((node) => {
-    const mark = node.marks.find((mark) => mark.type.name === "link");
-    if (mark) links.set(mark.attrs.id, structuredClone(mark.attrs.details));
-  });
-  return links;
-}
-
-export function fromEditorDocument(doc: EditorNode, links: Map<string, PortfolioLink>): PortfolioDocument {
+export function fromEditorDocument(doc: EditorNode): PortfolioDocument {
   const segments: PortfolioDocument["segments"] = [];
-  const used = new Set<string>();
+  const links = new Map<string, PortfolioLink>();
   doc.firstChild?.forEach((node) => {
-    const id = node.marks.find((mark) => mark.type.name === "link")?.attrs.id as string | undefined;
-    if (id) used.add(id);
+    const mark = node.marks.find((mark) => mark.type.name === "link");
+    const id = mark?.attrs.id as string | undefined;
+    if (mark && id) links.set(id, structuredClone(mark.attrs.details));
     segments.push(id ? { text: node.text || "", linkId: id } : { text: node.text || "" });
   });
-  return { version: 1, segments, links: [...links.values()].filter((link) => used.has(link.id)) };
+  return { version: 1, segments, links: [...links.values()] };
 }

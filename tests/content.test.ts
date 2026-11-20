@@ -7,7 +7,7 @@ import { fromEditorDocument, toEditorDocument } from "../src/lib/cms/editor";
 test("the seed and editor round trip preserve the current paragraph and link metadata", () => {
   const content = parseDocument(defaultDocument);
   assert.deepEqual(content, defaultDocument);
-  assert.deepEqual(fromEditorDocument(toEditorDocument(content), new Map(content.links.map((link) => [link.id, link]))), content);
+  assert.deepEqual(fromEditorDocument(toEditorDocument(content)), content);
 });
 
 test("linked text is structural, not substring matching", () => {

@@ -21,6 +21,7 @@ npm run build   # Vercel server/static output in .vercel/output/
 ## Content and interaction
 
 - `/admin` edits the paragraph, linked phrases, destinations, hover-preview details, and images. Changes are private to the editing tab until **Publish changes**. Supabase email/password login and explicit Anya-only account access are required.
+- The editor’s ProseMirror document owns link details as mark attributes; `src/lib/cms/editor.ts` converts that document to publishable content, including after undo/redo. There is no separate mutable link registry.
 - The CMS is disabled by default. `src/lib/cms/default-content.ts` preserves the current paragraph and bundled previews until configuration is explicitly enabled. The editor shows a setup message rather than an unprotected demo.
 - `src/components/PreviewLink.astro` contains the reusable preview and a small vanilla-JavaScript controller. Hover or keyboard focus opens a preview; Escape dismisses it. Links remain normal navigable links on touch devices and without JavaScript.
 - The introduction occupies the middle 40% of desktop screens, with smaller gutters on tablets and phones.

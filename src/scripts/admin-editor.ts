@@ -3,7 +3,7 @@ import { EditorView } from "prosemirror-view";
 import { history, undo, redo, closeHistory } from "prosemirror-history";
 import { keymap } from "prosemirror-keymap";
 import { baseKeymap } from "prosemirror-commands";
-import { editorLinks, fromEditorDocument, paragraphSchema, toEditorDocument } from "../lib/cms/editor";
+import { fromEditorDocument, paragraphSchema, toEditorDocument } from "../lib/cms/editor";
 import { parseDocument, type PortfolioLink, type PortfolioRecord } from "../lib/cms/content";
 
 interface InitialData {
@@ -19,7 +19,6 @@ if (root) initialize();
 function initialize() {
   const data = JSON.parse(document.querySelector("#editor-data")!.textContent!) as InitialData;
   const get = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
-  const links = new Map(data.record.document.links.map((link) => [link.id, link]));
   const publish = get<HTMLButtonElement>("publish");
   const add = get<HTMLButtonElement>("add-link");
   const remove = get<HTMLButtonElement>("remove-link");
@@ -30,7 +29,7 @@ function initialize() {
   const imageUpload = get<HTMLInputElement>("image-upload");
   const uploadStatus = get("upload-status");
   let revision = data.record.revision;
-  let saved = JSON.stringify(data.record.document);
+  let saved = "";
   let activeId: string | undefined;
   let busy = false;
   let uploading = false;
@@ -51,10 +50,6 @@ function initialize() {
         lastAction = "text";
       }
       view.updateState(view.state.apply(transaction));
-      if (transaction.docChanged) {
-        links.clear();
-        editorLinks(view.state.doc).forEach((link, id) => links.set(id, link));
-      }
       refresh(transaction.docChanged && !transaction.getMeta("linkDetails"));
     },
     handlePaste(_, event) {
@@ -71,7 +66,8 @@ function initialize() {
     },
   });
 
-  function currentDocument() { return fromEditorDocument(view.state.doc, links); }
+  function currentDocument() { return fromEditorDocument(view.state.doc); }
+  saved = JSON.stringify(currentDocument());
   function dirty() { return JSON.stringify(currentDocument()) !== saved || uploading; }
 
   function updateLink(link: PortfolioLink, action: string) {
@@ -117,7 +113,7 @@ function initialize() {
   function refresh(forceFields = false) {
     const doc = currentDocument();
     const nextId = selectedId();
-    const link = nextId ? links.get(nextId) : undefined;
+    const link = doc.links.find((link) => link.id === nextId);
     if (nextId !== activeId || forceFields) {
       activeId = nextId;
       if (link) {
@@ -213,19 +209,19 @@ function initialize() {
   form.addEventListener("input", (event) => {
     const input = event.target as HTMLInputElement;
     if (!activeId || !input.dataset.field) return;
-    const link = links.get(activeId)!;
-    link[input.dataset.field as "href" | "title" | "summary" | "imageAlt"] = input.value;
-    updateLink(link, `field:${activeId}:${input.dataset.field}`);
+    const link = currentDocument().links.find((link) => link.id === activeId)!;
+    updateLink({ ...link, [input.dataset.field]: input.value }, `field:${activeId}:${input.dataset.field}`);
   });
   imageChoice.addEventListener("change", () => {
     if (!activeId) return;
-    const link = links.get(activeId)!;
-    if (imageChoice.value === "none") { link.image = null; link.imageAlt = ""; }
+    const link = currentDocument().links.find((link) => link.id === activeId)!;
+    let details = link;
+    if (imageChoice.value === "none") details = { ...link, image: null, imageAlt: "" };
     else if (imageChoice.value === "tvm" || imageChoice.value === "post-credits") {
-      link.image = { kind: "bundled", id: imageChoice.value };
-      link.imageAlt = imageChoice.value === "tvm" ? "TVM logo" : "Post-Credits magazine cover";
+      details = { ...link, image: { kind: "bundled", id: imageChoice.value },
+        imageAlt: imageChoice.value === "tvm" ? "TVM logo" : "Post-Credits magazine cover" };
     }
-    updateLink(link, "image");
+    updateLink(details, "image");
     refresh(true);
   });
   imageUpload.addEventListener("change", async () => {
@@ -246,12 +242,11 @@ function initialize() {
       const uploaded = await fetch(started.url, { method: "PUT", body: file, headers: { "Content-Type": file.type } });
       if (!uploaded.ok) throw new Error("Image transfer failed. Check your connection and upload again.");
       const finished = await requestJson<{ id: string }>(`/api/admin/uploads/${started.id}`, {});
-      const link = links.get(id)!;
-      link.image = { kind: "upload", id: finished.id };
+      const link = currentDocument().links.find((link) => link.id === id)!;
       data.uploaded[finished.id] = `/api/admin/uploads/${finished.id}`;
       // Existing alt text is retained when replacing an image; a new image requires it.
       uploading = false;
-      updateLink(link, "image-upload");
+      updateLink({ ...link, image: { kind: "upload", id: finished.id } }, "image-upload");
       refresh(true);
       uploadStatus.textContent = "Image ready. Check its description, then publish to make it public.";
     } catch (error) {
