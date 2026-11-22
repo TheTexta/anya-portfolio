@@ -1,29 +1,59 @@
 # Anya portfolio
 
-A minimal Astro + Tailwind CSS portfolio for Anya Kasuri, with a custom protected paragraph editor at `/admin`. Inter is self-hosted through Fontsource. All visual styling uses Tailwind utility classes; the stylesheet only imports Tailwind and registers the font family. Astro's Vercel adapter provides on-demand rendering; no frontend framework is used.
+A minimal personal portfolio introducing Anya Kasuri and linking to her media work
+and organisations, with an optional protected paragraph editor at `/admin`.
 
-## Develop
+## Features
 
-Use Node.js 22.23.4 or a newer Node 22 release (`.nvmrc` is pinned; Vercel also uses Node 22).
+- A responsive, typography-led introduction with direct project links.
+- Hover and keyboard-focus previews; links also work without JavaScript.
+- An optional protected editor for text, links, and preview images, with explicit
+  publication.
+
+## Run locally
+
+Use Node.js **22.23.4 or a newer 22.x release** and npm. `.nvmrc` selects Node 22.
+From the repository root:
 
 ```sh
 npm ci
 npm run dev
 ```
 
+Open <http://localhost:4321>. No environment variables or backend credentials are
+needed for the bundled portfolio. The CMS defaults to disabled; `/admin` shows a
+setup message instead of an unprotected demo.
+
+For CMS development, copy [`.env.example`](.env.example) to an ignored `.env` file.
+Follow the [activation procedure](docs/admin-cms.md#activation-procedure) for approved
+schema/account setup and optional R2 uploads before setting `CMS_ENABLED=true`.
+Set `SITE_URL` to the exact local origin. Keep service-role and R2 credentials
+server-only; never expose them through `PUBLIC_*` variables or commit them.
+
+## Checks
+
 ```sh
 npm run check   # Astro and TypeScript diagnostics
-npm test        # Content, images, mocked storage, and isolated SQL/RLS tests
-npm run test:e2e # Browser tests with local test fixtures (Chrome)
-npm run build   # Vercel server/static output in .vercel/output/
+npm test        # Unit and isolated database tests
+npm run test:e2e # Local browser fixtures; Chrome by default
+npm run build   # Production build
 ```
 
-## Content and interaction
+See [local verification](docs/admin-cms.md#local-verification) for browser alternatives
+and required test ports. These local tests do not replace approved backend acceptance.
 
-- `/admin` edits the paragraph, linked phrases, destinations, hover-preview details, and images. Changes are private to the editing tab until **Publish changes**. Supabase email/password login and explicit Anya-only account access are required.
-- The editor’s ProseMirror document owns link details as mark attributes; `src/lib/cms/editor.ts` converts that document to publishable content, including after undo/redo. There is no separate mutable link registry.
-- The CMS is disabled by default. `src/lib/cms/default-content.ts` preserves the current paragraph and bundled previews until configuration is explicitly enabled. The editor shows a setup message rather than an unprotected demo.
-- `src/components/PreviewLink.astro` contains the reusable preview and a small vanilla-JavaScript controller. Hover or keyboard focus opens a preview; Escape dismisses it. Links remain normal navigable links on touch devices and without JavaScript.
-- The introduction occupies the middle 40% of desktop screens, with smaller gutters on tablets and phones.
-- The initial paragraph links TVM, Post-Credits, and MWS. TVM and Post-Credits use bundled preview images; MWS starts with a text-only preview. Other existing image assets are retained but are not part of the current rendered paragraph. No third-party embeds are loaded. Image sources are recorded in `src/assets/SOURCES.md`.
-- Production origin: <https://anya-portfolio-liard.vercel.app>; administration: `/admin`. See [docs/admin-cms.md](docs/admin-cms.md) and `.env.example` for schema, authentication, R2, local testing, and release evidence. The database, approved account grant, production environment, and published-only R2 delivery were configured with owner approval on 2026-11-09. Analytics are not added.
+## Architecture and design
+
+- Astro server rendering on Vercel, using TypeScript and vanilla JavaScript
+  rather than a frontend framework.
+- Tailwind utility styling and self-hosted Inter maintain the minimal
+  black-and-white presentation.
+- The optional CMS uses Supabase Auth/Postgres with site-specific editor access
+  and separate private/published R2 image storage.
+
+## Documentation
+
+- [CMS guide](docs/admin-cms.md): editing, authorization, uploads, setup gates,
+  recovery, and recorded deployment/acceptance evidence.
+- [Design system](DESIGN.md) and [product scope](PRODUCT.md).
+- [Image sources and attribution](src/assets/SOURCES.md).

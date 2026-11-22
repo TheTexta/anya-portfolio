@@ -15,6 +15,18 @@ on 2026-11-09.** Application deployment acceptance is recorded below.
 paragraph from `src/lib/cms/default-content.ts`; `/admin` reports incomplete setup
 and disables sign-in. That fallback is not a backup of later CMS edits.
 
+## Bundled content and editor model
+
+The original paragraph links TVM, Post-Credits, and McGill Wine Society. TVM and
+Post-Credits have bundled preview images; McGill Wine Society starts text-only.
+Other existing image assets are retained but do not appear in that paragraph.
+No third-party embeds are loaded. See [image attribution](../src/assets/SOURCES.md)
+and the [public layout specification](../DESIGN.md#layout).
+
+The ProseMirror document owns link details as mark attributes.
+`src/lib/cms/editor.ts` converts that document to publishable content, including
+after undo/redo; there is no separate mutable link registry.
+
 ## Editing
 
 - Type in the paragraph; select words and choose **Add link**. Select a linked
